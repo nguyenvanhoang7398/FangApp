@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="author" content="colorlib.com">
+    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fang.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="container bootstrap snippet">
+    <div class="fact-check-box">
+        <h1>Automatic Fact-check</h1>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped active" role="progressbar"
+            aria-valuenow="{{ job.progress }}" aria-valuemin="0" style="width:{{ job.progress }}%" aria-valuemax="100">
+            {{ job.progress }}% {{ job.stage }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <h1>Pending News</h1>
+                    {% for pending in pending_news %}
+                        <div class="search-result">
+                            <h3><a href="{{ pending.url }}">{{ pending.title }}</a></h3>
+                            <h4>{{ pending.timestamp }}</h4>
+                            <p></p>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                    {% endfor%}
+                    <h1>Checked News</h1>
+                    {% for checked in checked_news %}
+                        <div class="search-result">
+                            <h3><a href="{{ checked.url }}">{{ checked.title }}</a></h3>
+                            <h4>{{ checked.timestamp }}</h4>
+                                {% if checked.prediction == "real" %}
+                                    <h4><a style="color:green;">REAL</a></h4>
+                                    <div class="sc-gauge">
+                                        <div class="sc-background">
+                                          <div class="sc-percentage" style="transform:rotate({{ checked.degree }}deg);background-color:#00CD00;"></div>
+                                          <div class="sc-mask"></div>
+                                          <span class="sc-value">{{ checked.percentage }}%</span>
+                                        </div>
+                                        <span class="sc-min">0</span>
+                                        <span class="sc-max">100</span>
+                                    </div>
+                                {% elif checked.prediction == "fake" %}
+                                    <h4><a style="color:red;">FAKE</a></h4>
+                                    <div class="sc-gauge">
+                                        <div class="sc-background">
+                                          <div class="sc-percentage" style="transform:rotate({{ checked.degree }}deg);background-color:#FF6666;"></div>
+                                          <div class="sc-mask"></div>
+                                          <span class="sc-value">{{ checked.percentage }}%</span>
+                                        </div>
+                                        <span class="sc-min">0</span>
+                                        <span class="sc-max">100</span>
+                                    </div>
+                                {% endif %}
+                                    <h4>Job: {{ checked.job }}</h4>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                    {% endfor%}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
