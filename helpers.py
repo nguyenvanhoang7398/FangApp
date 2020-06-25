@@ -6,14 +6,18 @@ def es2news(es_results):
     search_results = []
     if "hits" in es_results and "hits" in es_results["hits"]:
         for hit in es_results["hits"]["hits"]:
-            search_results.append({
-                "title": hit["_source"]["title"],
-                "label": hit["_source"]["label"],
-                "url": hit["_source"]["url"],
-                "source_url": hit["_source"]["source_url"],
-                "source": hit["_source"]["source"],
-            })
+            search_results.append(es2news_fn(hit))
     return search_results
+
+
+def es2news_fn(hit):
+    return {
+        "title": hit["_source"]["title"],
+        "label": hit["_source"]["label"],
+        "url": hit["_source"]["url"],
+        "source_url": hit["_source"]["source_url"],
+        "source": hit["_source"]["source"],
+    }
 
 
 def es2pending_news(es_results):
@@ -34,21 +38,33 @@ def es2checked_news(es_results):
     search_results = []
     if "hits" in es_results and "hits" in es_results["hits"]:
         for hit in es_results["hits"]["hits"]:
-            ts = datetime.datetime.strptime(hit["_source"]["timestamp"], '%Y-%m-%dT%H:%M:%S.%f')
-            formatted_ts = ts.strftime("%b %d, %Y")
-            real_prob = hit["_source"]["real_prob"]
-            degree = 180 * real_prob
-            percentage = float("{:.2f}".format(real_prob * 100))
-            search_results.append({
-                "title": hit["_source"]["title"],
-                "url": hit["_source"]["url"],
-                "timestamp": formatted_ts,
-                "prediction": hit["_source"]["prediction"],
-                "job": hit["_source"]["job"],
-                "percentage": percentage,
-                "degree": degree
-            })
+            search_results.append(es2checked_news_fn(hit))
     return search_results
+
+
+def es2checked_news_fn(hit, parse_attn=False):
+    ts = datetime.datetime.strptime(hit["_source"]["timestamp"], '%Y-%m-%dT%H:%M:%S.%f')
+    formatted_ts = ts.strftime("%b %d, %Y")
+    real_prob = hit["_source"]["real_prob"]
+    degree = 180 * real_prob
+    percentage = float("{:.2f}".format(real_prob * 100))
+    engagements = hit["_source"]["engagements"]
+    if parse_attn:
+        for eng in engagements:
+            eng["attn_tokens"] = eng["attn_tokens"].split("_")
+    for eng in engagements:
+        eng["url"] = "https://twitter.com/HoangNg35203228/status/{}".format(eng["tweet_id"])
+    return {
+        "id": hit["_id"],
+        "title": hit["_source"]["title"],
+        "url": hit["_source"]["url"],
+        "timestamp": formatted_ts,
+        "prediction": hit["_source"]["prediction"],
+        "job": hit["_source"]["job"],
+        "percentage": percentage,
+        "degree": degree,
+        "engagements": engagements
+    }
 
 
 def es2job(es_job):

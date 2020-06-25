@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="author" content="colorlib.com">
+    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/view.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    {% for engagement in engagements %}
+                        <div class="search-result">
+                            <h3><a href="{{ engagement.url }}">{{ engagement.tweet_id }}</a></h3>
+                                {% if engagement.stance == "support" %}
+                                    <h4><a style="color:green;">SUPPORT</a></h4>
+                                {% elif engagement.stance == "deny" %}
+                                    <h4><a style="color:red;">DENY</a></h4>
+                                {% endif %}
+                                {% for tok in engagement.attn_tokens %}
+                                    <span class="badge badge-secondary">{{ tok }}</span>
+                                {% endfor%}
+                            <p></p>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                    {% endfor%}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

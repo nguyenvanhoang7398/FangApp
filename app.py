@@ -25,6 +25,20 @@ def posts():
     return render_template('results.html', results=verified_news, query=query)
 
 
+@app.route('/view', methods=['GET'])
+def view():
+    news_id = request.args.get('nid')
+    try:
+        news_es = es.get(index="checked-news", id=news_id)
+        news = helpers.es2checked_news_fn(news_es, parse_attn=True)
+    except elasticsearch.exceptions.NotFoundError:
+        news = None
+    if news is None:
+        return render_template('404.html')
+    else:
+        return render_template('view.html', engagements=news["engagements"])
+
+
 @app.route('/fang', methods=['GET', 'POST'])
 def fang():
     if request.method == 'POST':

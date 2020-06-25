@@ -811,6 +811,7 @@ legend {
 }
 
 .s003 {
+  position: relative;
   min-height: 100vh;
   display: -ms-flexbox;
   display: flex;
@@ -825,7 +826,13 @@ legend {
   padding: 15px;
 }
 
+.logo {
+  position: absolute;
+  top: 180px;
+}
+
 .s003 form {
+  position: absolute;
   width: 100%;
   max-width: 790px;
   margin-bottom: 0;

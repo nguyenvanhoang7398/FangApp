@@ -219,19 +219,39 @@ class FangManager(object):
 
         # read infer results, save to checked news and remove from pending news of ES
         infer_results = read_csv(result_local_path, False, "\t")
-        for row in infer_results:
-            news_id, prediction, real_prob, fake_prob = row[0], row[1], float(row[2]), float(row[3])
-            news_id = news_id.replace("news_", "")   # extract the actual news id
+        infer_attns = read_csv(attn_local_path, False, "\t")
+        for i, result_row in enumerate(infer_results):
+            news_id, prediction, real_prob, fake_prob = result_row[0], result_row[1], \
+                                                        float(result_row[2]), float(result_row[3])
+            attn_row = infer_attns[i]
+            attn_users, attn_tweets, stances, stance_attn_toks = \
+                attn_row[1].split(" "), attn_row[2].split(" "), attn_row[3].split(" "), attn_row[4].split(" ")
+            engagements = []
+            for user_id, tweet_id, stance, attn_tokens in zip( attn_users, attn_tweets, stances, stance_attn_toks):
+                engagements.append(
+                    {
+                        "user_id": remove_tag(user_id),
+                        "tweet_id": remove_tag(tweet_id),
+                        "stance": stance,
+                        "attn_tokens": attn_tokens
+                    }
+                )
+
+            news_id = remove_tag(news_id)   # extract the actual news id
             res = self.es_client.get(index="pending-news", id=news_id)
             pending_news = res['_source']
+            title = pending_news["title"]
+            url = pending_news["url"]
+            ts = pending_news["timestamp"]
             checked_news = {
-                "title": pending_news["title"],
-                "url": pending_news["url"],
-                "timestamp": pending_news["timestamp"],
+                "title": title,
+                "url": url,
+                "timestamp": ts,
                 "prediction": prediction,
                 "real_prob": real_prob,
                 "fake_prob": fake_prob,
-                "job": job_id
+                "job": job_id,
+                "engagements": engagements
             }
 
             # save checked news

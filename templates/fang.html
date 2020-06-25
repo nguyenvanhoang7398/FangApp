@@ -37,10 +37,10 @@
                     <h1>Checked News</h1>
                     {% for checked in checked_news %}
                         <div class="search-result">
-                            <h3><a href="{{ checked.url }}">{{ checked.title }}</a></h3>
+                            <h3><a href="{{ checked.url }}">{{checked.title}}</a></h3>
                             <h4>{{ checked.timestamp }}</h4>
                                 {% if checked.prediction == "real" %}
-                                    <h4><a style="color:green;">REAL</a></h4>
+                                    <h4><a  href="/view?nid={{checked.id}}" style="color:green;">REAL</a></h4>
                                     <div class="sc-gauge">
                                         <div class="sc-background">
                                           <div class="sc-percentage" style="transform:rotate({{ checked.degree }}deg);background-color:#00CD00;"></div>
@@ -51,7 +51,7 @@
                                         <span class="sc-max">100</span>
                                     </div>
                                 {% elif checked.prediction == "fake" %}
-                                    <h4><a style="color:red;">FAKE</a></h4>
+                                    <h4><a href="/view?nid={{checked.id}}" style="color:red;">FAKE</a></h4>
                                     <div class="sc-gauge">
                                         <div class="sc-background">
                                           <div class="sc-percentage" style="transform:rotate({{ checked.degree }}deg);background-color:#FF6666;"></div>
